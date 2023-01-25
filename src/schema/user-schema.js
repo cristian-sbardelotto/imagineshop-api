@@ -13,6 +13,3 @@ const userSchema = new Mongoose.Schema(
 );
 
 export default Mongoose.model('users', userSchema, 'users');
-// o primeiro é o nome do model
-//  segundo é o schema em si
-// o terceiro é o nome da collection
