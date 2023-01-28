@@ -13,6 +13,17 @@ app.get('/', async (req, res) => {
   res.send('Imagine Shop');
 });
 
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  const userService = new UserService();
+  const userLogged = await userService.login(email, password);
+
+  if (userLogged) {
+    return res.status(200).json(userLogged);
+  }
+  return res.status(400).json({ message: 'email ou senha inválidos!' })
+})
+
 app.post('/users', async (req, res) => {
   const { name, email, password } = req.body;
   const user = { name, email, password };
