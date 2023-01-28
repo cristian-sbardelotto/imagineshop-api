@@ -1,8 +1,8 @@
+import express from 'express';
 import 'dotenv/config';
 
-import express from 'express';
-
 import { UserService } from './services/user-service.js';
+import { authMiddleware } from './middlewares/authMiddleware.js';
 
 const app = express();
 const port = 5550;
@@ -30,8 +30,8 @@ app.get('/users', async (req, res) => {
   return res.status(200).json(users);
 });
 
-app.get('/users/:id', async (req, res) => {
-  const id = req.params;
+app.get('/users/:id', authMiddleware, async (req, res) => {
+  const id = req.params.id;
   const userService = new UserService();
 
   const user = await userService.findById(id);
@@ -43,7 +43,7 @@ app.get('/users/:id', async (req, res) => {
 });
 
 app.delete('/users/:id', async (req, res) => {
-  const id = req.params;
+  const id = req.params.id;
   const userService = new UserService();
 
   const user = await userService.findById(id);
@@ -57,7 +57,7 @@ app.delete('/users/:id', async (req, res) => {
 });
 
 app.put('/users/:id', async (req, res) => {
-  const id = req.params;
+  const id = req.params.id;
 
   const { name, email, password } = req.body;
   const user = { name, email, password };

@@ -8,7 +8,7 @@
   "editor.guides.bracketPairs": true,
   "editor.minimap.enabled": false,
   "editor.formatOnSave": true,
-  "editor.formatOnPaste": true,
+  "editor.formatOnPaste": false,
   "files.autoSave": "afterDelay",
 
   // explorer
