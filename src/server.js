@@ -1,5 +1,6 @@
 import express from 'express';
 import 'dotenv/config';
+import jwt from 'jsonwebtoken';
 
 import { UserService } from './services/user-service.js';
 import { authMiddleware } from './middlewares/authMiddleware.js';
@@ -19,10 +20,14 @@ app.post('/login', async (req, res) => {
   const userLogged = await userService.login(email, password);
 
   if (userLogged) {
-    return res.status(200).json(userLogged);
+    const secretKey = process.env.SECRET_KEY;
+    const token = jwt.sign({ user: userLogged }, secretKey, {
+      expiresIn: '60s',
+    });
+    return res.status(200).json({ token });
   }
-  return res.status(400).json({ message: 'email ou senha inválidos!' })
-})
+  return res.status(400).json({ message: 'email ou senha inválidos!' });
+});
 
 app.post('/users', async (req, res) => {
   const { name, email, password } = req.body;
@@ -77,7 +82,7 @@ app.put('/users/:id', async (req, res) => {
 
   if (findUser) {
     await userService.update(id, user);
-    return res.status(200).json({ message: 'Usuário atualizado com sucesso!' })
+    return res.status(200).json({ message: 'Usuário atualizado com sucesso!' });
   }
 
   return res.status(404).json({ message: 'Usuário não encontrado!' });
