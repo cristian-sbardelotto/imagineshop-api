@@ -27,7 +27,7 @@ export const authMiddleware = (req, res, next) => {
 
       const userService = new UserService();
       const user = await userService.findByEmail(decodedToken.user.email);
-      
+
       if (user) {
         next();
       }

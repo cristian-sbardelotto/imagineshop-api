@@ -6,7 +6,7 @@ import { UserService } from './services/user-service.js';
 import { authMiddleware } from './middlewares/authMiddleware.js';
 
 const app = express();
-const port = 5550;
+const port = process.env.PORT ||8080;
 
 const userNotFoundMessage = { message: 'Usuário não encontrado!' };
 
