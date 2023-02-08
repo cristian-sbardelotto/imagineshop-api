@@ -8,7 +8,7 @@
   "editor.guides.bracketPairs": true,
   "editor.minimap.enabled": false,
   "editor.formatOnSave": true,
-  "editor.formatOnPaste": true,
+  "editor.formatOnPaste": false,
   "files.autoSave": "afterDelay",
 
   // explorer
@@ -24,7 +24,7 @@
   "prettier.enable": true,
 
   // terminal
-  "terminal.integrated.fontSize": 18,
+  "terminal.integrated.fontSize": 16,
   "terminal.integrated.profiles.windows": {
     "Git Bash": {
       "source": "Git Bash"
