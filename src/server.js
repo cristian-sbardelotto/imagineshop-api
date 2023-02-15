@@ -3,10 +3,11 @@ import 'dotenv/config';
 import jwt from 'jsonwebtoken';
 
 import { UserService } from './services/user-service.js';
+import { ProductService } from './services/product-service.js';
 import { authMiddleware } from './middlewares/authMiddleware.js';
 
 const app = express();
-const port = process.env.PORT ||8080;
+const port = process.env.PORT || 8080;
 
 const userNotFoundMessage = { message: 'Usuário não encontrado!' };
 
@@ -24,12 +25,19 @@ app.post('/login', async (req, res) => {
   if (userLogged) {
     const secretKey = process.env.SECRET_KEY;
     const token = jwt.sign({ user: userLogged }, secretKey, {
-      expiresIn: '3600s',
+      expiresIn: '1d',
     });
     return res.status(200).json({ token });
   }
   return res.status(400).json({ message: 'email ou senha inválidos!' });
 });
+
+app.get('/products', async (req, res) => {
+  const productService = new ProductService();
+  const products = await productService.findAll();
+
+  return res.status(200).json(products);
+})
 
 app.use(authMiddleware);
 
@@ -90,6 +98,21 @@ app.put('/users/:id', async (req, res) => {
   }
 
   return res.status(404).json(userNotFoundMessage);
+});
+
+app.post('/products', async (req, res) => {
+  // name: String,
+  // description: String,
+  // price: Number,
+  // summary: String,
+  // stock: Number,
+  // fileName: String,
+
+  const { name, description, price, summary, stock } = req.body;
+  const product = { name, description, price, summary, stock };
+  const productService = new ProductService();
+  await productService.create(product);
+  return res.status(201).json(product);
 });
 
 app.listen(port, () => {
