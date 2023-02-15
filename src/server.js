@@ -1,6 +1,9 @@
 import express from 'express';
 import 'dotenv/config';
 import jwt from 'jsonwebtoken';
+import multer from 'multer';
+import crypto from 'crypto';
+import { extname } from 'path';
 
 import { UserService } from './services/user-service.js';
 import { ProductService } from './services/product-service.js';
@@ -8,10 +11,23 @@ import { authMiddleware } from './middlewares/authMiddleware.js';
 
 const app = express();
 const port = process.env.PORT || 8080;
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    const newFileName = crypto.randomBytes(32).toString('hex');
+    const fileExtension = extname(file.originalname);
+    cb(null, `${newFileName}${fileExtension}`);
+  },
+});
+
+const uploadMiddleware = multer({ storage });
 
 const userNotFoundMessage = { message: 'Usuário não encontrado!' };
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/', async (req, res) => {
   res.send('Imagine Shop');
@@ -37,8 +53,9 @@ app.get('/products', async (req, res) => {
   const products = await productService.findAll();
 
   return res.status(200).json(products);
-})
+});
 
+app.use('/uploads', express.static('uploads'));
 app.use(authMiddleware);
 
 app.post('/users', async (req, res) => {
@@ -100,18 +117,13 @@ app.put('/users/:id', async (req, res) => {
   return res.status(404).json(userNotFoundMessage);
 });
 
-app.post('/products', async (req, res) => {
-  // name: String,
-  // description: String,
-  // price: Number,
-  // summary: String,
-  // stock: Number,
-  // fileName: String,
-
+app.post('/products', uploadMiddleware.single('image'), async (req, res) => {
   const { name, description, price, summary, stock } = req.body;
-  const product = { name, description, price, summary, stock };
+  const fileName = req.file.filename;
+  const product = { name, description, price, summary, stock, fileName };
   const productService = new ProductService();
   await productService.create(product);
+  console.log(typeof req.file);
   return res.status(201).json(product);
 });
 
