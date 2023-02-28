@@ -16,7 +16,7 @@
 
   // workbench
   "workbench.editor.enablePreview": false,
-  "workbench.iconTheme": "material-icon-theme",
+  "workbench.iconTheme": "Monokai Pro Icons",
   "workbench.colorTheme": "Default Dark+",
 
   // prettier
