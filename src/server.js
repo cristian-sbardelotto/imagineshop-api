@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import multer from 'multer';
 import crypto from 'crypto';
 import { extname } from 'path';
+import cors from 'cors';
 
 import { UserService } from './services/user-service.js';
 import { ProductService } from './services/product-service.js';
@@ -26,6 +27,7 @@ const uploadMiddleware = multer({ storage });
 
 const userNotFoundMessage = { message: 'Usuário não encontrado!' };
 
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -53,6 +55,18 @@ app.get('/products', async (req, res) => {
   const products = await productService.findAll();
 
   return res.status(200).json(products);
+});
+
+app.get('/products/:id', async (req, res) => {
+  const id = req.params.id;
+  const productService = new ProductService();
+  const product = await productService.findById(id);
+
+  if (product) {
+    return res.status(200).json(product);
+  }
+
+  return res.status(404).json({ message: 'Produto não encontrado.' });
 });
 
 app.use('/uploads', express.static('uploads'));
@@ -123,8 +137,18 @@ app.post('/products', uploadMiddleware.single('image'), async (req, res) => {
   const product = { name, description, price, summary, stock, fileName };
   const productService = new ProductService();
   await productService.create(product);
-  console.log(typeof req.file);
   return res.status(201).json(product);
+});
+
+app.post('/products/sell', async (req, res) => {
+  const { products } = req.body;
+  const productService = new ProductService();
+
+  for (const product of products) {
+    await productService.sellProduct(product)
+  }
+
+  return res.status(200).json({ message: 'success' });
 });
 
 app.listen(port, () => {
